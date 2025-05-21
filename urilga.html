@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Урилга</title>
+  <style>
+    /* CSS хэсэг эхлэл */
+    body {
+      background-color: #f8d8e3;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .envelope-container {
+      cursor: pointer;
+    }
+
+    .envelope {
+      font-size: 60px;
+      background-color: #e91e63;
+      padding: 20px;
+      border-radius: 15px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s;
+    }
+
+    .envelope:hover {
+      transform: scale(1.1);
+    }
+
+    .letter {
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      width: 300px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .letter p {
+      margin: 10px 0;
+      color: #333;
+    }
+
+    .buttons {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    #yesBtn {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    #noBtn {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .love-message {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 36px;
+      color: #e91e63;
+      font-weight: bold;
+      z-index: 999;
+      animation: fadeIn 2s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translate(-50%, -60%) scale(0.5); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    #confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 998;
+      pointer-events: none;
+    }
+    /* CSS хэсэг дуусах */
+  </style>
+</head>
+<body>
+  <!-- HTML хэсэг эхлэл -->
+  <div class="envelope-container">
+    <div class="envelope">✉️</div>
+  </div>
+
+  <div class="letter hidden" id="letter">
+    <p>Хайрт Сараулжаргал аа,</p>
+    <p>Танийг <strong>2-р сарын 25-ны Бямба гарагт</strong>, цагийг хамт зугаатай өнгөрүүлэх хөгжилтэй болзоонд урьж байна.</p>
+    <p>Хүндэтгэсэн,<br><strong>Баттогтох</strong></p>
+
+    <div class="buttons">
+      <button id="yesBtn">YES</button>
+      <button id="noBtn">NO</button>
+    </div>
+  </div>
+
+  <div class="love-message hidden" id="loveMessage">Хайртай шүү ❤️</div>
+  <canvas id="confettiCanvas" class="hidden"></canvas>
+  <!-- HTML хэсэг дуусах -->
+
+  <script>
+    // JS хэсэг эхлэл
+    document.addEventListener("DOMContentLoaded", () => {
+      const yesBtn = document.getElementById("yesBtn");
+      const noBtn = document.getElementById("noBtn");
+      const envelope = document.querySelector(".envelope-container");
+
+      yesBtn.addEventListener("click", respondYes);
+      noBtn.addEventListener("click", respondNo);
+      envelope.addEventListener("click", openLetter);
+    });
+
+    function openLetter() {
+      document.querySelector(".envelope-container").style.display = "none";
+      document.getElementById("letter").classList.remove("hidden");
+    }
+
+    function respondYes() {
+      document.getElementById("letter").style.display = "none";
+      document.getElementById("loveMessage").classList.remove("hidden");
+      startConfetti();
+    }
+
+    function respondNo() {
+      const yesBtn = document.getElementById("yesBtn");
+      yesBtn.style.transform = "scale(5)";
+      yesBtn.style.position = "fixed";
+      yesBtn.style.top = "50%";
+      yesBtn.style.left = "50%";
+      yesBtn.style.transform = "translate(-50%, -50%) scale(5)";
+      yesBtn.style.zIndex = "1000";
+
+      const noBtn = document.getElementById("noBtn");
+      noBtn.style.display = "none";
+    }
+
+    function startConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      canvas.classList.remove('hidden');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const confetti = Array.from({length: 300}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 2,
+        d: Math.random() * 0.5 + 0.5,
+        color: "hsl(" + (Math.random() * 360) + ", 100%, 70%)"
+      }));
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const c of confetti) {
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2, false);
+          ctx.fillStyle = c.color;
+          ctx.fill();
+
+          c.y += c.d * 5;
+          if (c.y > canvas.height) {
+            c.y = -10;
+            c.x = Math.random() * canvas.width;
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    }
+    // JS хэсэг дуусах
+  </script>
+</body>
+</html>
